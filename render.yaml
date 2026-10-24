@@ -1,0 +1,41 @@
+services:
+  - type: web
+    name: ask-10-humans
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    # One worker: the monitor loop runs inside the web process.
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: PUBLIC_BASE_URL
+        sync: false          # e.g. https://ask-10-humans.onrender.com
+      - key: WHOP_BUSINESS_ID
+        value: biz_cNH3PPb4JRGlkd
+      - key: WHOP_WEBHOOK_SECRET
+        sync: false
+      - key: WHOP_API_KEY
+        sync: false
+      - key: TERAC_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM
+        sync: false
+      - key: ADMIN_TOKEN
+        generateValue: true
+      - key: PRICE_USD
+        value: "9"
+      - key: TERAC_AUTO_LAUNCH
+        value: "true"
+    # SQLite + decisions.log live on local disk, which is wiped on every deploy on the free plan.
+    # On a paid plan, attach a disk and point the paths at it:
+    # disk:
+    #   name: data
+    #   mountPath: /var/data
+    #   sizeGB: 1
+    # (then set DATABASE_PATH=/var/data/ask10.db and DECISIONS_LOG_PATH=/var/data/decisions.log)
